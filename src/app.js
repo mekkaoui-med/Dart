@@ -4,8 +4,7 @@
 const form = document.getElementById("daret-form");
 
 const input = document.getElementById("nom-cercle");
-const error = document.getElementById("nom-cercle-erreur");
-
+const inputErreur = document.getElementById("nom-cercle-erreur");
 
 const regexPattern = /^[\p{L}\p{N} -]{3,40}$/u;
 
@@ -14,13 +13,14 @@ function validateNomCercle() {
   const isValid = regexPattern.test(value);
 
   if (isValid) {
-    error.textContent = "";
-    error.classList.add("hidden");
+    inputErreur.textContent = "";
+    inputErreur.classList.add("hidden");
     input.classList.remove("border-daret-erreur");
     input.classList.add("border-daret-bordure");
   } else {
-    error.textContent = "3 à 40 caractères : lettres, chiffres, espaces, tirets.";
-    error.classList.remove("hidden");
+    inputErreur.textContent =
+      "3 à 40 caractères : lettres, chiffres, espaces, tirets.";
+    inputErreur.classList.remove("hidden");
     input.classList.remove("border-daret-bordure");
     input.classList.add("border-daret-erreur");
   }
@@ -36,5 +36,5 @@ form.addEventListener("submit", (e) => {
     return;
   }
 
-//   console.log(input.value.trim());
+  //   console.log(input.value.trim());
 });
