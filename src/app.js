@@ -15,8 +15,18 @@ const periodiciteErreur = document.getElementById("periodicite-erreur");
 const dateDebut = document.getElementById("date-debut");
 const dateDebutErreur = document.getElementById("date-debut-erreur");
 
-const inputAjParticipant = document.getElementById("nput-Aj-participant");
-const ajouterParticipant = document.getElementById("ajouter-participant")
+const inputAjParticipant = document.getElementById("input-Aj-participant");
+const ajouterParticipant = document.getElementById("ajouter-participant");
+const participantsListe = document.getElementById("participants-liste");
+const participantsErreur = document.getElementById("participants-erreur");
+const ajoutParticipantZone = document.getElementById("ajouter-participant-zone")
+const validerAjoutParticipant = document.getElementById("valdation-ajout-participant")
+ 
+inputAjParticipant.classList.remove("hidden")
+ajouterParticipant.addEventListener("click", function(){
+    ajoutParticipantZone.classList.remove("hidden");
+    inputAjParticipant.focus();
+})
 
 const regexPattern = /^[\p{L}\p{N} -]{3,40}$/u;
 
@@ -151,5 +161,4 @@ form.addEventListener("submit", (e) => {
     return;
   }
 
-  //   console.log(input.value.trim());
 });
