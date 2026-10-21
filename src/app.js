@@ -132,9 +132,21 @@ function validateDate() {
   return validateDay;
 }
 
-function validateParticipants(){
+function validateParticipants(name){
+    name.trim()
+    if(name === ""){
+        return "Veuillez saisir un prénom."
+    }
+    if(!regexPattern.test(name)){
+        return "Le prénom doit contenir entre 2 et 30 lettres."
+    }
 
 }
+
+validerAjoutParticipant.addEventListener("click", function(){
+    const validationParticipantMsg = validateParticipants(inputAjParticipant.value)
+    
+})
 
 input.addEventListener("input", validateNomCercle);
 selectedPeriodicite.addEventListener("change", validatePeriodicite);
