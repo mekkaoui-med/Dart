@@ -70,6 +70,7 @@
               name="periodicite"
               class="mt-1 w-full rounded border border-daret-bordure bg-white px-3 py-2 focus:outline-2 focus:outline-offset-2 focus:outline-daret-vert"
             >
+              <option value="">Veuillez sélectionner Périodicité </option>
               <option value="hebdomadaire">Hebdomadaire</option>
               <option value="quinzaine">Tous les 15 jours</option>
               <option value="mensuelle">Mensuelle</option>
@@ -100,6 +101,9 @@
 
             <p id="participants-erreur" class="mt-1 hidden text-sm font-medium text-daret-erreur"></p>
 
+
+            <!-- adding the input of adding participant -->
+            <input type="text" class="border rounded-2xl hidden text-daret-erreur" id="input-Aj-participant" /> 
             <button
               type="button"
               id="ajouter-participant"
