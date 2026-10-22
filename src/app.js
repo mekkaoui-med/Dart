@@ -19,16 +19,25 @@ const inputAjParticipant = document.getElementById("input-Aj-participant");
 const ajouterParticipant = document.getElementById("ajouter-participant");
 const participantsListe = document.getElementById("participants-liste");
 const participantsErreur = document.getElementById("participants-erreur");
-const ajoutParticipantZone = document.getElementById("ajouter-participant-zone")
-const validerAjoutParticipant = document.getElementById("valdation-ajout-participant")
- 
-inputAjParticipant.classList.remove("hidden")
-ajouterParticipant.addEventListener("click", function(){
-    ajoutParticipantZone.classList.remove("hidden");
-    inputAjParticipant.focus();
-})
+const ajoutParticipantZone = document.getElementById(
+  "ajouter-participant-zone",
+);
+const validerAjoutParticipant = document.getElementById(
+  "valdation-ajout-participant",
+);
+const participantsCompteur = document.getElementById("participants-compteur");
+
+const minParticipant = Number(participantsListe.dataset.min);
+const maxParticipant = Number(participantsListe.dataset.max);
+
+inputAjParticipant.classList.remove("hidden");
+ajouterParticipant.addEventListener("click", function () {
+  ajoutParticipantZone.classList.remove("hidden");
+  inputAjParticipant.focus();
+});
 
 const regexPattern = /^[\p{L}\p{N} -]{3,40}$/u;
+const participantRegex = /^\p{L}{2,30}$/u;
 
 function validateNomCercle() {
   const value = input.value.trim();
@@ -37,14 +46,14 @@ function validateNomCercle() {
   if (isValid) {
     inputErreur.textContent = "";
     inputErreur.classList.add("hidden");
-    input.setAttribute("aria-invalid", "true");
+    input.setAttribute("aria-invalid", "false");
     input.classList.remove("border-daret-erreur");
     input.classList.add("border-daret-bordure");
   } else {
     inputErreur.textContent =
       "3 à 40 caractères : lettres, chiffres, espaces, tirets.";
     inputErreur.classList.remove("hidden");
-    input.setAttribute("aria-invalid", "false");
+    input.setAttribute("aria-invalid", "true");
     input.classList.remove("border-daret-bordure");
     input.classList.add("border-daret-erreur");
   }
@@ -131,22 +140,126 @@ function validateDate() {
   }
   return validateDay;
 }
-
-function validateParticipants(name){
-    name.trim()
-    if(name === ""){
-        return "Veuillez saisir un prénom."
-    }
-    if(!regexPattern.test(name)){
-        return "Le prénom doit contenir entre 2 et 30 lettres."
-    }
-
+function validateParticipants(name) {
+  name = name.trim();
+  if (name === "") {
+    return "Veuillez saisir un prénom.";
+  }
+  if (!participantRegex.test(name)) {
+    return "Le prénom doit contenir entre 2 et 30 lettres.";
+  }
+  return "";
 }
 
-validerAjoutParticipant.addEventListener("click", function(){
-    const validationParticipantMsg = validateParticipants(inputAjParticipant.value)
-    
-})
+function creerParticipant(name) {
+  const li = document.createElement("li");
+  li.className = "flex items-center gap-2";
+
+  const input = document.createElement("input");
+  input.type = "text";
+  input.name = "participants[]";
+  input.value = name;
+  input.placeholder = "Entrez un prénom";
+  input.className = "border rounded-2xl px-3 py-2";
+  input.required = true;
+
+  const buttonRetirer = document.createElement("button");
+  buttonRetirer.type = "button";
+  buttonRetirer.textContent = "Retirer";
+  buttonRetirer.className = "rounded border px-3 py-2";
+  buttonRetirer.dataset.action = "retirer";
+
+  li.append(input, buttonRetirer);
+  participantsListe.append(li);
+}
+
+creerParticipant("");
+creerParticipant("");
+creerParticipant("");
+
+
+
+function metreAjourCounter() {
+  const count = participantsListe.children.length;
+
+  participantsCompteur.textContent = `${count} participant${count > 1 ? "s" : ""}`;
+}
+
+validerAjoutParticipant.addEventListener("click", function () {
+  const nouveauPrenom = inputAjParticipant.value.trim();
+
+  // 1. Validate the name
+  const validationMessage = validateParticipants(nouveauPrenom);
+
+  if (validationMessage !== "") {
+    participantsErreur.textContent = validationMessage;
+    participantsErreur.classList.remove("hidden");
+    return;
+  }
+
+  // 2. Check the maximum
+  const count = participantsListe.children.length;
+
+  if (count >= maxParticipant) {
+    participantsErreur.textContent = `Vous ne pouvez pas ajouter plus de ${maxParticipant} participants.`;
+    participantsErreur.classList.remove("hidden");
+    return;
+  }
+
+  // 3. Check for duplicate names
+  const prenomExiste = Array.from(
+    participantsListe.querySelectorAll("input"),
+  ).some(
+    (input) => input.value.trim().toLowerCase() === nouveauPrenom.toLowerCase(),
+  );
+
+  if (prenomExiste) {
+    participantsErreur.textContent = "Ce prénom existe déjà.";
+    participantsErreur.classList.remove("hidden");
+    return;
+  }
+
+  // 4. Create the participant
+  creerParticipant(nouveauPrenom);
+
+  // 5. Clear the temporary input and error
+  inputAjParticipant.value = "";
+  participantsErreur.textContent = "";
+  participantsErreur.classList.add("hidden");
+
+  // 6. Update the counter
+  metreAjourCounter();
+
+  inputAjParticipant.focus();
+});
+
+
+
+participantsListe.addEventListener("click", function (event) {
+  const button = event.target.closest('[data-action="retirer"]');
+
+  if (!button || !participantsListe.contains(button)) {
+    return;
+  }
+
+  const count = participantsListe.children.length;
+
+  if (count <= minParticipant) {
+    participantsErreur.textContent =
+      `Vous devez garder au moins ${minParticipant} participants.`;
+    participantsErreur.classList.remove("hidden");
+    return;
+  }
+
+  button.closest("li").remove();
+
+  participantsErreur.textContent = "";
+  participantsErreur.classList.add("hidden");
+
+  metreAjourCounter();
+});
+metreAjourCounter();
+
 
 input.addEventListener("input", validateNomCercle);
 selectedPeriodicite.addEventListener("change", validatePeriodicite);
@@ -172,5 +285,4 @@ form.addEventListener("submit", (e) => {
     dateDebut.focus();
     return;
   }
-
 });
