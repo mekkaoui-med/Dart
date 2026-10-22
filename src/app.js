@@ -30,6 +30,15 @@ const participantsCompteur = document.getElementById("participants-compteur");
 const minParticipant = Number(participantsListe.dataset.min);
 const maxParticipant = Number(participantsListe.dataset.max);
 
+// us-03 :
+const resumeCagnotte = document.getElementById("resume-cagnotte");
+const resumeTotalCycle = document.getElementById("resume-total-cycle");
+const resumeNbTours = document.getElementById("resume-nb-tours");
+const resumeDates = document.getElementById("resume-dates");
+
+const contenuResultat = document.getElementById("contenu-resultat");
+const etatVide = document.getElementById("etat-vide");
+
 inputAjParticipant.classList.remove("hidden");
 ajouterParticipant.addEventListener("click", function () {
   ajoutParticipantZone.classList.remove("hidden");
@@ -177,12 +186,66 @@ creerParticipant("");
 creerParticipant("");
 creerParticipant("");
 
-
-
 function metreAjourCounter() {
   const count = participantsListe.children.length;
 
   participantsCompteur.textContent = `${count} participant${count > 1 ? "s" : ""}`;
+}
+
+function calculerCercle() {
+  const contisation = Number(Cotisationinput.value);
+  const participants = participantsListe.querySelectorAll(
+    'input[name="participants[]"]',
+  );
+  const nombreParticipants = participants.length;
+
+  const totalParTour = contisation * nombreParticipants;
+  const nombreTours = nombreParticipants;
+  const totalParParticipant = contisation * nombreTours
+  return{
+    nombreParticipants,
+    totalParTour,
+    nombreTours,
+    totalParParticipant,
+  }
+}
+// afich the result of dart :
+
+function afficheResult(){
+    const result = calculerCercle();
+    resumeCagnotte.textContent = '${result.totalParTour} MAD'
+    resumeTotalCycle.textContent = '${result.totalParParticipant} MAD'
+    resumeNbTours.textContent = result.nombreTours
+
+    contenuResultat.classList.remove("hidden")
+    etatVide.classList.add("hidden")
+
+}
+function calculerDateFin(dateDebut, periodicite, nombreTours) {
+  const date = new Date(`${dateDebut}T12:00:00`);
+
+  for (let i = 1; i < nombreTours; i++) {
+    if (periodicite === "hebdomadaire") {
+      date.setDate(date.getDate() + 7);
+    } else if (periodicite === "quinzaine") {
+      date.setDate(date.getDate() + 15);
+    } else if (periodicite === "mensuelle") {
+      const jour = date.getDate();
+
+      date.setDate(1);
+      date.setMonth(date.getMonth() + 1);
+
+      const dernierJour = new Date(
+        date.getFullYear(),
+        date.getMonth() + 1,
+        0,
+      ).getDate();
+
+      date.setDate(Math.min(jour, dernierJour));
+    }
+  }
+
+  return date;
 }
 
 validerAjoutParticipant.addEventListener("click", function () {
@@ -233,8 +296,6 @@ validerAjoutParticipant.addEventListener("click", function () {
   inputAjParticipant.focus();
 });
 
-
-
 participantsListe.addEventListener("click", function (event) {
   const button = event.target.closest('[data-action="retirer"]');
 
@@ -245,8 +306,7 @@ participantsListe.addEventListener("click", function (event) {
   const count = participantsListe.children.length;
 
   if (count <= minParticipant) {
-    participantsErreur.textContent =
-      `Vous devez garder au moins ${minParticipant} participants.`;
+    participantsErreur.textContent = `Vous devez garder au moins ${minParticipant} participants.`;
     participantsErreur.classList.remove("hidden");
     return;
   }
@@ -259,7 +319,6 @@ participantsListe.addEventListener("click", function (event) {
   metreAjourCounter();
 });
 metreAjourCounter();
-
 
 input.addEventListener("input", validateNomCercle);
 selectedPeriodicite.addEventListener("change", validatePeriodicite);
