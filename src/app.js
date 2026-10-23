@@ -192,34 +192,47 @@ function metreAjourCounter() {
   participantsCompteur.textContent = `${count} participant${count > 1 ? "s" : ""}`;
 }
 
-function calculerCercle() {
-  const contisation = Number(Cotisationinput.value);
-  const participants = participantsListe.querySelectorAll(
-    'input[name="participants[]"]',
-  );
-  const nombreParticipants = participants.length;
-
-  const totalParTour = contisation * nombreParticipants;
+function calculerCercle(cotisation, nombreParticipants) {
+  const montantBeneficiaire = cotisation * nombreParticipants;
   const nombreTours = nombreParticipants;
-  const totalParParticipant = contisation * nombreTours
-  return{
-    nombreParticipants,
-    totalParTour,
+  const totalParParticipant = cotisation * nombreTours;
+
+  return {
+    montantBeneficiaire,
     nombreTours,
     totalParParticipant,
-  }
+  };
 }
 // afich the result of dart :
 
-function afficheResult(){
-    const result = calculerCercle();
-    resumeCagnotte.textContent = '${result.totalParTour} MAD'
-    resumeTotalCycle.textContent = '${result.totalParParticipant} MAD'
-    resumeNbTours.textContent = result.nombreTours
+function afficheResult() {
+  const cotisation = Number(Cotisationinput.value);
+  const nombreParticipants = participantsListe.querySelectorAll(
+    'input[name="participants[]"]',
+  ).length;
 
-    contenuResultat.classList.remove("hidden")
-    etatVide.classList.add("hidden")
+  const result = calculerCercle(cotisation, nombreParticipants);
 
+  resumeCagnotte.textContent = `${result.montantBeneficiaire} MAD`;
+  resumeTotalCycle.textContent = `${result.totalParParticipant} MAD`;
+  resumeNbTours.textContent = result.nombreTours;
+
+  const dateFin = calculerDateFin(
+    dateDebut.value,
+    selectedPeriodicite.value,
+    result.nombreTours,
+  );
+
+  const dateDebutFormatee = new Date(
+    `${dateDebut.value}T12:00:00`,
+  ).toLocaleDateString("fr-FR");
+
+  const dateFinFormatee = dateFin.toLocaleDateString("fr-FR");
+
+  resumeDates.textContent = `${dateDebutFormatee} – ${dateFinFormatee}`;
+
+  contenuResultat.classList.remove("hidden");
+  etatVide.classList.add("hidden");
 }
 function calculerDateFin(dateDebut, periodicite, nombreTours) {
   const date = new Date(`${dateDebut}T12:00:00`);
@@ -344,4 +357,5 @@ form.addEventListener("submit", (e) => {
     dateDebut.focus();
     return;
   }
+    afficheResult();
 });
